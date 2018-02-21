@@ -9,6 +9,7 @@ $problemstatement_width:350px;
   .row{
     margin-bottom: 0;
   }
+
   .header-bar-controls{
     display: inline-block;
     width: 350px;
@@ -72,8 +73,18 @@ $problemstatement_width:350px;
   .admin.inactive:before{
     color:#c45;
   }
+  .btn.blue{
+    margin-top:5px;
+    margin-left:10px;
+    height:30px;
+  }
 }
 .primary-content{
+  #code-editorX{
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
   .problem-statement{
     position: absolute;
     right:0;
@@ -104,6 +115,4 @@ $problemstatement_width:350px;
   float: right;
   margin-right: 20px;
 }
-.header-bar-controls{
 
-}

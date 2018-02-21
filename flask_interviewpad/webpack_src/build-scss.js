@@ -1,7 +1,5 @@
 const exec = require('child_process').exec;
-let x = process.argv.splice(0,2)
-console.log(process.argv)
-console.log(x)
+process.argv.splice(0,2)
 const cmd = 'node-sass '+process.argv.join(" ")
 console.log("RUN:",cmd)
 var yourscript = exec(cmd,

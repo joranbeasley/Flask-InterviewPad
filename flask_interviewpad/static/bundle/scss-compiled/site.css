@@ -53,6 +53,15 @@
     color: #4c5; }
   .footer-bar .admin.inactive:before {
     color: #c45; }
+  .footer-bar .btn.blue {
+    margin-top: 5px;
+    margin-left: 10px;
+    height: 30px; }
+
+.primary-content #code-editorX {
+  width: 100%;
+  height: 100%;
+  display: block; }
 
 .primary-content .problem-statement {
   position: absolute;

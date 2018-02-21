@@ -14,6 +14,10 @@ def after_n_minutes(n):
 
 class CandidateEvaluation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    reviewer_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    reviewer = db.relationship('User', backref=db.backref('my_candidates', lazy=True))
+    candidate_id = db.Column(db.Integer, db.ForeignKey('active_room_user.id'))
+    candidate = db.relationship('ActiveRoomUser', backref=db.backref('my_reviewers', lazy=True))
     notes = db.Column(db.Text,nullable=True,default="")
     technical_skills = db.Column(db.Integer,nullable=True,default=None)
     willingness_to_learn = db.Column(db.Integer,nullable=True,default=None)
@@ -22,14 +26,6 @@ class CandidateEvaluation(db.Model):
     creative = db.Column(db.Integer,nullable=True,default=None)
     organized = db.Column(db.Integer,nullable=True,default=None)
 
-class CandidateEvaluator(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    reviewer_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    reviewer = db.relationship('User', backref=db.backref('my_candidates', lazy=True))
-    invitee_id = db.Column(db.Integer, db.ForeignKey('active_room_user.id'))
-    invitee = db.relationship('ActiveRoomUser', backref=db.backref('my_reviewers', lazy=True))
-    report_id = db.Column(db.Integer, db.ForeignKey('candidate_evaluation.id'))
-    report = db.relationship('CandidateEvaluation', backref=db.backref('my_reviewer', lazy=True))
 
 
 class Room(db.Model):

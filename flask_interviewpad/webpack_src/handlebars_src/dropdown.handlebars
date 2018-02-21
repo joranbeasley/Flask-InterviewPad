@@ -1,0 +1,7 @@
+<select name="{{name}}" id="{{id}}" class="js-example-basic-single">
+    {{# each options}}
+        <option value="{{this}}" {{#isEqual ../selected_opt this}}selected="selected"{{/isEqual}}>{{this}}</option>
+    {{/each}}
+</select>
+
+
