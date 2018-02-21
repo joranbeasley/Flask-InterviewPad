@@ -1,0 +1,16 @@
+{
+  "name": "handlebars-templates-for-flask-interviewpad",
+  "version": "0.2.0",
+  "description": "template collection",
+  "scripts": {
+    "build:handlebars": "node build-handlebars.js",
+    "build:scss": "node build-scss.js -r ./scss -o ../static/bundle/scss-compiled",
+    "watch:scss": "node build-scss.js -rw ./scss -o ../static/bundle/scss-compiled",
+    "build":"npm run build:handlebars && npm run build:scss"
+  },
+  "dependencies": {
+    "browserify": "^16.1.0",
+    "handlebars": "~4.0.11",
+    "node-sass": "~4.7.2"
+  }
+}

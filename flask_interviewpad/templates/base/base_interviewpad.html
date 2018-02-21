@@ -1,0 +1,17 @@
+{% extends "base/base_template.html" %}
+
+{% block body -%}
+        <div class="header-bar black white-text">
+            {%- block header_bar %}{% endblock -%}
+        </div>
+
+
+        <div class="primary-content">
+            {%- block bodycontent %}{% endblock -%}
+        </div>
+
+
+        <div class="footer-bar black white-text">
+            {%- block footer_bar %}{% endblock -%}
+        </div>
+{%- endblock body %}

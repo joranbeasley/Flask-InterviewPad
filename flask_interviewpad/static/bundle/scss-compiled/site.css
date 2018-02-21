@@ -1,0 +1,83 @@
+.header-bar {
+  background: #263238;
+  height: 50px; }
+  .header-bar .row {
+    margin-bottom: 0; }
+  .header-bar .header-bar-controls {
+    display: inline-block;
+    width: 350px;
+    margin-left: 10px;
+    margin-top: 10px; }
+  .header-bar a.comments {
+    position: relative;
+    font-size: 36px;
+    color: white;
+    cursor: pointer; }
+    .header-bar a.comments span.num {
+      position: absolute;
+      font-size: 12px;
+      top: 1px;
+      color: #fff;
+      right: 2px;
+      z-index: 2;
+      background: red;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      vertical-align: center;
+      text-align: center;
+      font-weight: bold; }
+
+.footer-bar {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 50px;
+  background: #263238; }
+  .footer-bar .my-btn {
+    padding: 1px 5px 1px 5px;
+    margin: 1px;
+    background: #4f4f4f;
+    border-radius: 8px; }
+  .footer-bar .my-btn.admin {
+    padding-left: 12px; }
+  .footer-bar .my-btn.admin:before {
+    position: relative;
+    top: 1px;
+    left: -5px;
+    font-size: 20px;
+    color: #222;
+    content: "\25cf"; }
+  .footer-bar .admin.active:before {
+    color: #4c5; }
+  .footer-bar .admin.inactive:before {
+    color: #c45; }
+
+.primary-content .problem-statement {
+  position: absolute;
+  right: 0;
+  top: 50px;
+  bottom: 50px;
+  width: 350px; }
+  .primary-content .problem-statement .h4 {
+    border-bottom: #4f4f4f thin solid; }
+
+.primary-content .code-editor-container {
+  position: absolute;
+  left: 0;
+  right: 350px;
+  top: 50px;
+  bottom: 50px; }
+
+.room-title {
+  font-size: 24px;
+  margin-left: 10px; }
+
+.fa-copyright {
+  margin-right: 20px;
+  margin-top: 5px; }
+
+.chat-toggle {
+  float: right;
+  margin-right: 20px; }

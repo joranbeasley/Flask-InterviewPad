@@ -1,0 +1,109 @@
+$room_color:#263238;
+$header_height:50px;
+$footer_height:50px;
+$problemstatement_width:350px;
+
+.header-bar{
+  background: $room_color;
+  height: $header_height;
+  .row{
+    margin-bottom: 0;
+  }
+  .header-bar-controls{
+    display: inline-block;
+    width: 350px;
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+  a.comments {
+    position: relative;
+    font-size: 36px;
+    color: white;
+    cursor: pointer;
+
+    span.num {
+      position: absolute;
+      font-size: 12px;
+      top: 1px;
+      color: #fff;
+      right: 2px;
+      z-index: 2;
+      background: red;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      vertical-align: center;
+      text-align: center;
+      font-weight: bold;
+
+    }
+
+  }
+
+
+}
+.footer-bar{
+  position: absolute;
+  bottom:0;
+  right:0;
+  left:0;
+  height: $footer_height;
+  background: $room_color;
+  .my-btn{
+    padding:1px 5px 1px 5px;
+    margin:1px;
+    background: #4f4f4f;
+    border-radius: 8px;
+  }
+  .my-btn.admin{
+    padding-left:12px;
+  }
+  .my-btn.admin:before{
+    position:relative;
+    top:1px;
+    left:-5px;
+    font-size:20px;
+    color:#222;
+    content:"\25cf";
+  }
+  .admin.active:before{
+    color:#4c5;
+  }
+  .admin.inactive:before{
+    color:#c45;
+  }
+}
+.primary-content{
+  .problem-statement{
+    position: absolute;
+    right:0;
+    top:$header_height;
+    bottom:$footer_height;
+    width: $problemstatement_width;
+    .h4{
+      border-bottom: #4f4f4f thin solid;
+    }
+  }
+  .code-editor-container{
+    position: absolute;
+    left: 0;
+    right:$problemstatement_width;
+    top:$header_height;
+    bottom:$footer_height;
+  }
+}
+.room-title{
+  font-size: 24px;
+  margin-left: 10px;
+}
+.fa-copyright{
+  margin-right: 20px;
+  margin-top: 5px;
+}
+.chat-toggle{
+  float: right;
+  margin-right: 20px;
+}
+.header-bar-controls{
+
+}

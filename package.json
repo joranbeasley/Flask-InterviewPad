@@ -1,0 +1,7 @@
+{
+  "name": "Flask-InterviewPad",
+  "version": "0.0.1",
+  "scripts": {
+      "build-webpack":"cd flask_interviewpad/webpack_src && npm run build"
+  }
+}

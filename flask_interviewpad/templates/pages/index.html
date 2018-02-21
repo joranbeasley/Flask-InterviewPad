@@ -1,0 +1,15 @@
+{% extends "base/base_interviewpad.html" %}
+{% block extra_head -%}
+    <link rel="stylesheet" href="/static/bundle/scss-compiled/dropdown.css">
+{%- endblock %}
+{% block header_bar -%}
+    {%- include "partials/header_bar.html" -%}
+{%- endblock header_bar %}
+{% block bodycontent -%}
+
+    <div class="code-editor-container grey darken-3 white-text">CODE HERE!</div>
+    <div class="problem-statement"><h4>Problem Statement</h4></div>
+{%- endblock  %}
+{% block footer_bar -%}
+    {%- include "partials/footer_bar.html" -%}
+{%- endblock footer_bar %}

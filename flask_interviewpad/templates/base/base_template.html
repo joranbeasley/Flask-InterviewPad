@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{{ title }}{% endblock %}</title>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+    <script  src="http://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.runtime.min.js"></script>
+    <script src="/static/bundle/handlebars.template.bundle.js"></script>
+    <link rel="stylesheet" href="/static/bundle/scss-compiled/site.css">
+    {% block extra_head %}
+    {% endblock %}
+</head>
+<body>
+    {% block body %}
+    {% endblock %}
+    {% block endof_body %}
+    {% endblock endof_body %}
+</body>
+</html>
