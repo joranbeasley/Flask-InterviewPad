@@ -1,8 +1,5 @@
-$room_color:#263238;
-$header_height:50px;
-$footer_height:50px;
-$problemstatement_width:350px;
-
+@import "variables.scss";
+@import "chatpanel.scss";
 .header-bar{
   background: $room_color;
   height: $header_height;
@@ -85,6 +82,7 @@ $problemstatement_width:350px;
     height: 100%;
     display: block;
   }
+
   .problem-statement{
     position: absolute;
     right:0;

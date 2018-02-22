@@ -1,0 +1,43 @@
+{% extends "base_html.html" %}
+{% block extra_head %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/{{ language|default("python") }}.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/{{ highlight_theme|default("obsidian") }}.min.css" />
+    <link rel="stylesheet" href="/static/css/stars.css" />
+    <script src="/static/js/stars.js"></script>
+{% endblock extra_head %}
+
+{% block body_content %}
+
+    <div class="row">
+        <div class="col s6">
+            <h3>Review of : {{ candidate_name }}</h3>
+
+            <h5>By : {{ reviewer_name }}</h5>
+            <table class="striped">
+                {% for label, input_name, current_rating in grades %}
+                    {% include "partials/stars_line.html" %}
+                {% endfor %}
+
+                <tr>
+                    <th><strong>Additional Notes</strong></th>
+                    <td><textarea name="notes">{{ notes }}</textarea></td>
+               </tr>
+                <tr>
+                    <td><button class="btn blue">Submit</button> </td>
+               </tr>
+            </table>
+        </div>
+        <div class="col s6" style="display:inline-block;height: 600px;overflow: scroll">
+            <pre><code class="{{ language|default("python") }}">{{ candidates_code }}</code></pre>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+{% block after_body %}
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+{% endblock %}

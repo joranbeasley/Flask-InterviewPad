@@ -4,9 +4,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.1/ace.js"></script>
     <script src="/static/js/my-ace.js"></script>
+    <script src="/static/js/socketio-controller.js"></script>
     <script src="/static/js/handlebar_helpers.js"></script>
     <link rel="stylesheet" href="/static/bundle/scss-compiled/drop2.css">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
 {%- endblock %}
 {% block header_bar -%}
     {%- include "partials/header_bar.html" -%}
@@ -15,12 +16,17 @@
 
     <div class="code-editor-container grey darken-3 white-text"><div id="code-editorX"></div></div>
     <div class="problem-statement"><h4>Problem Statement</h4></div>
+    {% include "partials/chat-panel.html" %}
 {%- endblock  %}
 {% block footer_bar -%}
     {%- include "partials/footer_bar.html" -%}
 {%- endblock footer_bar %}
 {% block endof_body -%}
     <script>
+    function toggle_chat(){
+        $('.chat-panel').toggleClass('open')
+        $('.comments > .num').remove()
+    }
     $(document).ready(function() {
         $('.header-bar-controls').append(
             Handlebars.templates.dropdown({name:"mode",id:'mode-dropdown',selected_opt:"python",
@@ -31,11 +37,17 @@
             Handlebars.templates.dropdown({name:"theme",id:'theme-dropdown',selected_opt:"monokai",
                 options:["ambiance","chaos","chrome","clouds_midnight","clouds","cobalt","crimson_editor","dawn","dracula","dreamweaver","eclipse","github","gob","gruvbox","idle_fingers","iplastic","katzenmilch","kr_theme","kuroir","merbivore_soft","merbivore","mono_industrial","monokai","pastel_on_dark","solarized_dark","solarized_light","sqlserver","terminal","textmate","tomorrow_night_blue","tomorrow_night_bright","tomorrow_night_eighties","tomorrow_night","tomorrow","twilight","vibrant_ink","xcode"]
             })
-        )
+        );
+
         $('.js-example-basic-single').select2({width:"150px",theme: "flat"});
         var editor = new MyAceEditor('code-editorX');
         editor.loadExtension("whitespace")
         editor.init()
+        //token=btoa("{username}:{room_id}:{issued_timestamp}")
+        var userCredentials = {'username':'{{ username }}','token':'{{ auth_token }}'}
+        ws =new MySocketIO("ws://localhost:5000",userCredentials)
+
+        console.log(ws)
     });
 
     </script>

@@ -1,0 +1,28 @@
+<table class="bordered">
+    <tr>
+        <th>public</th>
+        <th>name</th>
+        <th>active</th>
+        <th>owner</th>
+        <th>users</th>
+        <th>created</th>
+        <th>last_active</th>
+        <th><a href="/admin/create_room" class="btn green">Create Room</a> </th>
+    </tr>
+
+    {% for room in rooms %}
+        {% include "admin-components/fragments/room_table_row.html" %}
+    {% else %}
+        <tr><td colspan="8"><h3>You Havent Got Any Rooms Yet. Go Ahead and create some!</h3></td></tr>
+    {% endfor %}
+</table>
+<script>
+    function delete_room(room_name,room_id){
+        if(confirm("Really Delete Room "+room_name+"?")){
+            if(confirm("You should probably disable the room, not delete it... are you sure you want to delete it?")) {
+                document.location.href = "/admin/delete/room/" + room_id.toString()
+            }
+        }
+    }
+
+</script>

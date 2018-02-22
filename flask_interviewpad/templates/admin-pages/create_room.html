@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Session</title>
+        <script  src="http://code.jquery.com/jquery-2.2.4.min.js"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<!-- Compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+
+<!-- Compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script>
+    var language_options={ {% for key,val in languages %}"{{ key }}": "{{ val }}",{% endfor %} };
+    $(function() {
+        $('input.autocomplete').autocomplete({
+            data: language_options,
+            onAutocomplete: function(val) {
+                    console.log(val)
+                    $("#room_language").val(language_options[val])
+            },
+        });
+    });
+</script>
+</head>
+<body>
+<div class="row">
+    <form class="col s12" method="post">
+      <div class="row">
+        <div class="disabled col s12">
+          <input disabled type="text" id="autocomplete-input" class="autocomplete disabled" value="Python">
+          <input type="hidden" id="room_language" name="room_language" value="python">
+          <label for="autocomplete-input">Language</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <input name="room_name" placeholder="Room Name" id="room_name" type="text" class="validate">
+          <label for="room_name">Room Name</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s4">
+            <input name="invite_only" type="checkbox" id="invite_only" checked="checked" />
+            <label for="invite_only">Invite Only</label>
+        </div>
+          <div class="col s4" >
+                <div class="red-text hide" id="open_room_warning">This room is open to anyone with the room name!<i class="material-icons">warning</i> </div>
+          </div>
+          <div class="col s4" >
+                <button class="btn blue right">Create Session</button>
+          </div>
+      </div>
+
+    </form>
+  </div>
+<script>
+    $("#invite_only").on('change',function(){
+        if(!$('#invite_only').prop('checked')){
+            $("#open_room_warning").removeClass('hide')
+        }else{
+            $("#open_room_warning").addClass('hide')
+
+        }
+    });
+    function toggle_invite_only(){
+
+    }
+</script>
+</body>
+</html>
