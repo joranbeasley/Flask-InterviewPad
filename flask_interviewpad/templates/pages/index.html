@@ -59,6 +59,18 @@
         {#var users = {{ room.all_users(True)|encode("json") }};#}
         {#console.log(users)#}
     });
+    function do_copy(divId){
+        console.log("LETS COPY!!",divId)
+        var input = document.createElement('input')
+        input.id="__copyText__";
+        input.value = document.getElementById(divId).innerText;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        var txt = input.value
+        input.remove()
+        console.log("OK COPIED: '"+txt+"'")
+    }
     function view_invitation_popup(ele){
         console.log("View Invitation:",ele);
         console.log($(ele).data('userInfo'))
@@ -123,9 +135,11 @@
         $(".my-droplist").show()
     }
     $(document).click(function (e) {
-        if ($(e.target).parents(".my-droplist").length === 0)  {
+        if ($(e.target).parents(".my-droplist").length === 0 && !$('.my-droplist').is(":hidden")) {
                 $(".my-droplist").hide();
                 console.log("OK HIDE???")
+        }else{
+
         }
     });
     {#    {% endif %}#}

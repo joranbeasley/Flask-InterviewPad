@@ -6,7 +6,7 @@ from flask import request
 from flask_socketio import SocketIO, disconnect, emit, join_room
 
 # print(create_token("joran",1))
-from flask_interviewpad.models import ActiveRoomUser
+from flask_interviewpad.models import ActiveRoomUser, db
 
 sock = SocketIO()
 @sock.on('connect')
@@ -49,8 +49,10 @@ def on_room_join(payload):
     print("issued:",issued_ago)
     print("User wishes to join room",p2)
     room_user.sid = request.sid
-    join_room("%s"%room_user.room.id)
+    room_user.state = "active"
+    db.session.commit()
+    join_room("%s"%room_user.room_id)
     request_sync({})
     data = room_user.to_dict()
 
-    emit('user_joined',data)
+    emit('user_joined',data,room=str(room_user.room_id))

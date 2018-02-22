@@ -30,6 +30,7 @@ function MySocketIO(ws_url,userCredentials,options){
         console.log("GOT SYNC RESULT!",data)
     });
     self.on("user_joined",function(data){
+        console.log("USER JOINED!:",data)
         Materialize.toast("User "+data['nickname']+" has joined the room!", 2000);
 
     });

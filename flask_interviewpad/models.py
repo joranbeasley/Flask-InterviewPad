@@ -12,8 +12,11 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 def create_invite_token():
     return hashlib.md5(("%s-@XKCD!-%s"%(time.time(),random.random())).encode('latin1')).hexdigest()
-def after_n_minutes(n):
-    return lambda:datetime.datetime.now()+datetime.timedelta(seconds=int(n*60))
+def datetime_in(minutes=0,seconds=0,hours=0,days=0):
+    hours += days*24
+    minutes += hours*60
+    seconds += minutes*60
+    return lambda:datetime.datetime.now()+datetime.timedelta(seconds=seconds)
 
 def create_token(user_id,room_id):
     token_fmt= "{user_id}|{room_id}|{issued_at}"
@@ -200,7 +203,7 @@ class ActiveRoomUser(db.Model):
     user_color = db.Column(db.String,default=get_random_color)
     temporary_token  = db.Column(db.String(60),default="")
     invite_code = db.Column(db.String(80),default=create_invite_token)
-    invite_expires = db.Column(db.DateTime,default=after_n_minutes(80))
+    invite_expires = db.Column(db.DateTime,default=datetime_in(days=1))
     session_started = db.Column(db.DateTime,default=datetime.datetime.now)
     session_ended = db.Column(db.DateTime, default=None,nullable=True)
     @property
@@ -232,7 +235,8 @@ class ActiveRoomUser(db.Model):
             "user_color":self.user_color,
             "session_started":self.session_started.isoformat(),
             "session_ended":self.session_ended.isoformat() if self.session_ended else None,
-            "is_active":self.is_active
+            "is_active":self.is_active,
+            "invite_expires":self.invite_expires.isoformat()
         }
     @staticmethod
     def leave_room(room=None):
