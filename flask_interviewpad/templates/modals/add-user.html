@@ -1,0 +1,35 @@
+<!-- Modal Structure -->
+<div id="add-user-modal" class="modal">
+    <div class="modal-content">
+      <h4>Add User</h4>
+        <form class="col s12" id="add-user-form"  action="/admin/create/user" method="post">
+          <div class="row">
+            <div class="input-field col s6">
+              <input onkeyup="$('#nickname').val($(this).val().split(' ',2)[0])" id="realname" name="realname" type="text" class="validate">
+              <label for="realname">Real Name</label>
+            </div>
+            <div class="input-field col s6">
+              <input placeholder="Placeholder" id="nickname" name="nickname" type="text" class="validate">
+              <label for="nickname">Nickname</label>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="input-field col s12">
+              <input name="password" id="password" type="password" class="validate">
+              <label for="password">Password</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s8">
+              <input name="email" id="email" type="email" class="validate">
+              <label for="email">Email</label>
+            </div>
+              <div class="col s4"><button class="btn blue">Add User!</button></div>
+          </div>
+
+        </form>
+    </div>
+
+</div>

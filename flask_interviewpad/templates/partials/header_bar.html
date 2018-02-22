@@ -1,7 +1,12 @@
 <div class="row">
     <div class="col s12">
-        <span class="chat-toggle right"><a onclick="toggle_chat()" class="comments"><i class="fa fa-comments"></i> <span class="num">99</span></a></span>
-        <span class="room-title"> {{ room_name }}  |</span>  <span class="username-header">[ {{ username }} ]</span>
+        <span class="chat-toggle right"><a onclick="toggle_chat()" class="comments">
+            <span class="fa-layers fa-fw">
+            <i class="fas fa-comments"></i>
+            <span id="new-msg-indicator" class="fa-layers-counter" style="background:tomato;display:none"></span>
+            </span>
+            </a></span>
+        <span class="room-title"> {{ room.room_name }}  |</span>  <span class="username-header">[ {{ user.nickname }} ]</span>
         <div class="header-bar-controls"></div>
     </div>
 </div>

@@ -1,0 +1,46 @@
+<!-- Modal Structure -->
+<div id="invite-candidate-modal" class="modal">
+    <div class="modal-content">
+      <h4>Invite Candidate</h4>
+        <form class="col s12" id="invite-candidate-form"  action="/admin/create/invitation" method="post">
+          <div class="row">
+            <div class="input-field col s6">
+              <input onkeyup="$('#nickname').val($(this).val().split(' ',2)[0])" id="realname" name="realname" type="text" class="validate">
+              <label for="realname">Real Name</label>
+            </div>
+            <div class="input-field col s6">
+              <input placeholder="Placeholder" id="nickname" name="nickname" type="text" class="validate">
+              <label for="nickname">Nickname</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s8">
+              <input name="email" id="email" type="email" class="validate">
+              <input name="room_id"  type="hidden" value="{{ room.id }}" >
+              <label for="email">Email</label>
+            </div>
+              <div class="col s4"><a href="#submit" onclick="invite_candidate()" class="btn blue">Invite Candidate</a></div>
+          </div>
+
+        </form>
+    </div>
+</div>
+<div id="add-user-modal" class="modal">
+    <div class="modal-content">
+      <h4>Candidate is Invited</h4>
+        <p>
+            <span id="new-candidate-name" style="font-weight: bold">{NAME}</span> has been invited to this room. however they do not know this. You may send them a customized email below or simply send the the url, that is associated with this invite*.
+        </p>
+
+        <p>
+            <b>Invite URL:</b> <a id="join-room-link" href=""><i class="fa fa-link"></i> </a><a><i class="fa fa-copy fa-border fa-2x" style="padding: 2px;height:1em"></i> </a>
+
+            <textarea id="email-message-input" class="browser-default" style="width: 100%;height:150px;"></textarea>
+        </p>
+        <button class="btn blue">Email Invitation</button>
+    </div>
+</div>
+<script>
+
+
+</script>

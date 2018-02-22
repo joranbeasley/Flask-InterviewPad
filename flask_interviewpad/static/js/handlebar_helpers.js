@@ -5,3 +5,7 @@ Handlebars.registerHelper('isEqual', function(lvalue, rvalue, options) {
             return options.fn(this);
         }
     });
+
+Handlebars.registerHelper('json', function(context) {
+    return JSON.stringify(context).replace(/"/g, '&quot;');
+});

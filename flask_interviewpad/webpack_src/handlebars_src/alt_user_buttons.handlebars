@@ -1,0 +1,7 @@
+{{# each users }}
+    <span id="user-{{this.nickname}}" onclick="click_user({{{json this}}})"
+          style="border-bottom: {{ this.user_color }} medium solid"
+          class="my-btn admin {{this.state}}">
+        {{this.nickname}}
+    </span>
+{{/each}}

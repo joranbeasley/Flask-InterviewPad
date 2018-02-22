@@ -1,0 +1,7 @@
+{{# each users }}
+    <span onclick="click_user({{{json this}}},$event)"
+          style="border-bottom: {{ this.user_color }} medium solid"
+          class="my-btn">
+        {{this.nickname}}
+    </span>
+{{/each}}

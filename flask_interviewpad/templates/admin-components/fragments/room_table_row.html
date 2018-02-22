@@ -7,13 +7,13 @@
         {% endif %}
     </td>
     <td>
-        <a href="/session/{{ room.room_name }}">{{ room.room_name }}</a>
+        <a href="/room/{{ room.id }}"><i class="fa fa-link"></i> {{ room.room_name }}</a>
     </td>
     <td>
         <div class="switch">
             <label>
                 Off
-                <input onchange="notify(this,{{ room.id }})" type="checkbox" {% if room.active %}checked="checked"{% endif %}>
+                <input onchange="notify(this,{{ room.id }})" type="checkbox" {% if room.is_active %}checked="checked"{% endif %}>
                 <span class="lever"></span>
                 Active
             </label>
@@ -22,13 +22,10 @@
     <td>
         {{ room.owner.realname }}
     </td><td>
-        {{ active_users[room.room_name]|length }}/{{ room.room_members()|length }}
+        {{ room.active_users_count() }}/{{ room.all_users_count() }}
     </td>
     <td>
-        {{ room.created()|strftime("%b %d,%Y") }}
-    </td>
-    <td>
-        {{ room.last_modified()|strftime("%b %d,%Y") }}
+        {{ room.created|strftime("%b %d,%Y") }}
     </td>
     <td>
         <button onclick="delete_room('{{ room.room_name }}',{{ room.id }})" class="btn red"><i class="material-icons">delete_forever</i> </button>

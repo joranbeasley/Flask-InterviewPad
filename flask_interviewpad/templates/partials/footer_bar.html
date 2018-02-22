@@ -1,11 +1,18 @@
 <div class="row" id="footer_bar">
-    <a class="btn blue">Invite User <i class="fas fa-user-plus"></i></a>
-
+{#    {% if is_admin %}#}
+    <a href="#invite-candidate-modal" class="btn blue modal-trigger">Invite User <i class="fas fa-user-plus"></i></a>
+{#    {% endif %}#}
     <span id="users-holder">
-        <span class="my-btn">Test0</span>
-        <span class="my-btn admin">Test1</span>
-        <span class="my-btn admin active">Test1</span>
-        <span class="my-btn admin inactive">Test1</span>
+{#        <span class="my-btn">Test0</span>#}
+{#        <span class="my-btn admin">Test1</span>#}
+{#        <span class="my-btn admin active">Test1</span>#}
+{#        <span class="my-btn admin inactive">Test1</span>#}
+{#        {% for user in room.all_users() %}#}
+{#            <span onclick="click_user(USERS['{{ user.nickname }}'])" style="border-bottom: {{ user.user_color }} medium solid" class="my-btn#}
+{#        {%- if not current_user.is_anonymous and current_user.is_admin %} admin {{ user.state }}{% endif -%}">#}
+{#            {{ user.nickname }}#}
+{#            </span>#}
+{#        {% endfor %}#}
     </span>
     <i class="fa fa-copyright fa right"></i>
 </div>

@@ -8,6 +8,9 @@
     <script src="/static/js/handlebar_helpers.js"></script>
     <link rel="stylesheet" href="/static/bundle/scss-compiled/drop2.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+
+{#    {% if is_admin %}#}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
 {%- endblock %}
 {% block header_bar -%}
     {%- include "partials/header_bar.html" -%}
@@ -22,11 +25,14 @@
     {%- include "partials/footer_bar.html" -%}
 {%- endblock footer_bar %}
 {% block endof_body -%}
+
+
     <script>
     function toggle_chat(){
         $('.chat-panel').toggleClass('open')
         $('.comments > .num').remove()
     }
+
     $(document).ready(function() {
         $('.header-bar-controls').append(
             Handlebars.templates.dropdown({name:"mode",id:'mode-dropdown',selected_opt:"python",
@@ -38,17 +44,94 @@
                 options:["ambiance","chaos","chrome","clouds_midnight","clouds","cobalt","crimson_editor","dawn","dracula","dreamweaver","eclipse","github","gob","gruvbox","idle_fingers","iplastic","katzenmilch","kr_theme","kuroir","merbivore_soft","merbivore","mono_industrial","monokai","pastel_on_dark","solarized_dark","solarized_light","sqlserver","terminal","textmate","tomorrow_night_blue","tomorrow_night_bright","tomorrow_night_eighties","tomorrow_night","tomorrow","twilight","vibrant_ink","xcode"]
             })
         );
-
+        $(".modal").modal()
         $('.js-example-basic-single').select2({width:"150px",theme: "flat"});
         var editor = new MyAceEditor('code-editorX');
         editor.loadExtension("whitespace")
         editor.init()
         //token=btoa("{username}:{room_id}:{issued_timestamp}")
-        var userCredentials = {'username':'{{ username }}','token':'{{ auth_token }}'}
+        var userCredentials = {'username':'{{ user.nickname }}','token':'{{ user.temporary_token }}'}
         ws =new MySocketIO("ws://localhost:5000",userCredentials)
-
-        console.log(ws)
+        ws.editor = editor;
+        {% if current_user.is_admin %}
+            ws.handlebar_template = Handlebars.templates.alt_user_buttons
+        {% endif %}
+        {#var users = {{ room.all_users(True)|encode("json") }};#}
+        {#console.log(users)#}
     });
+    function view_invitation_popup(ele){
+        console.log("View Invitation:",ele);
+        console.log($(ele).data('userInfo'))
+        show_invitation($(ele).data('userInfo'))
+    }
+    function send_whisper(ele){
+        console.log("WHISPER:",ele);
+        console.log($(ele).data('userInfo'))
+    }
+    function kick_user(ele){
+        console.log("Kick USER:",ele)
+        console.log($(ele).data('userInfo'))
+    }
+    function click_user(userDetails,evt){
+        console.log(userDetails)
+        var btn = $("#user-"+userDetails.nickname);
+        console.log(btn)
+        var bb = btn[0].getBoundingClientRect();
+        var px_btm = (window.innerHeight-bb.top)-5;
+        var px_lft = bb.left-2;
+        $(".my-droplist > div").data('userInfo',userDetails)
+        $(".my-droplist").css({
+            "position":'absolute',
+            "bottom":px_btm.toString()+'px',
+            "left":px_lft.toString()+'px',
+            "z-index":100
+        })
+        console.log("EVT:",px_btm,bb.top,window.innerHeight)
+        setTimeout(show_dropdown,100);
 
+    }
+    function show_invitation(data){
+       $("#new-candidate-name").text(data['nickname'])
+       $("#join-room-link").attr("href",data['url']);
+       $("#join-room-link").text(data['url']);
+       msg = "Hello "+data['nickname']+"\n\n    Please join us for an interactive coding session at the link below:\n"+
+               data['url']+"\n\nThanks";
+       $("#email-message-input").text(msg);
+       $('#add-user-modal').modal('open')
+    }
+    {#    {% if is_admin %}#}
+    function invite_candidate(){
+        var data = $("#invite-candidate-form").serialize(); // serializes the form's elements.
+        console.log("OK??",data);
+        $.ajax({
+           type: "POST",
+           url: '/admin/create/invitation',
+           data: data,
+           success: function(data)
+           {
+               data = JSON.parse(data);
+               console.log(data);
+               $('.modal').modal('close');
+                show_invitation(data)
+           }
+         });
+
+
+    }
+    function show_dropdown(){
+        console.log("OK SHOW!! IT!!!")
+        $(".my-droplist").show()
+    }
+    $(document).click(function (e) {
+        if ($(e.target).parents(".my-droplist").length === 0)  {
+                $(".my-droplist").hide();
+                console.log("OK HIDE???")
+        }
+    });
+    {#    {% endif %}#}
     </script>
+
+    {#    {% if is_admin %}#}
+    {% include "modals/create-invitation.html" %}
+    {% include "modals/user-menu.html" %}
 {%- endblock %}

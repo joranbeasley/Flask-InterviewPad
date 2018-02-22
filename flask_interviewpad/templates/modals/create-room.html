@@ -1,0 +1,28 @@
+<!-- Modal Structure -->
+<div id="create-room-modal" class="modal">
+    <div class="modal-content">
+      <h4>Create Room</h4>
+    <form class="row" id="create-room-form" action="/admin/create/room" method="post">
+
+      <div class="row">
+        <div class="input-field col s12">
+          <input name="room_name" placeholder="Room Name" id="room_name" type="text" class="validate">
+          <label for="room_name">Room Name</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s4">
+            <input name="invite_only" type="checkbox" id="invite_only" checked="checked" />
+            <label for="invite_only">Invite Only</label>
+        </div>
+          <div class="col s4" >
+                <div class="red-text hide" id="open_room_warning">This room is open to anyone with the room name!<i class="material-icons">warning</i> </div>
+          </div>
+          <div class="col s4" >
+                <button class="btn blue right">Create Session</button>
+          </div>
+      </div>
+        </form>
+    </div>
+
+</div>

@@ -111,12 +111,12 @@ function MyAceEditor(divId){
             console.log("Extension Loaded!:",extName)
         }
     };
-    this.value = function(new_text){
+    this.value = function(new_text,cursorPosition){
         if(self.editor_instance===null){return null;}
         if(new_text===undefined){
-            return self.editor_instance.value();
+            return self.editor_instance.getValue();
         }else{
-            self.editor_instance.value(new_text);
+            self.editor_instance.setValue(new_text,cursorPosition);
             return new_text;
         }
     };

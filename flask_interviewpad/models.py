@@ -2,16 +2,16 @@ import base64
 import datetime
 import time
 import hashlib
+import random
 
 from flask import request, session
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql.functions import current_user, random
-
+from flask_interviewpad.constants import COLOR_LIST
 db = SQLAlchemy()
 login_manager = LoginManager()
 def create_invite_token():
-    return hashlib.md5(b"%s-@XKCD!-%s"%(time.time(),random.random())).hexdigest()
+    return hashlib.md5(("%s-@XKCD!-%s"%(time.time(),random.random())).encode('latin1')).hexdigest()
 def after_n_minutes(n):
     return lambda:datetime.datetime.now()+datetime.timedelta(seconds=int(n*60))
 
@@ -49,10 +49,37 @@ class Room(db.Model):
     room_name=db.Column(db.String(40))
     invite_only = db.Column(db.Boolean,default=True)
     editing_enabled = db.Column(db.Boolean,default=True)
+    language = db.Column(db.String(20), default="python")
     is_active = db.Column(db.Boolean,default=True)
-    language=db.Column(db.String(20))
-    current_text=db.Column(db.Text())
+    current_text=db.Column(db.Text(),default="")
     created=db.Column(db.DateTime,default=datetime.datetime.now)
+    def to_dict(self):
+        return {
+            "room_name":self.room_name,
+            "language":self.language,
+            "current_text":self.current_text,
+            "users":self.all_users(True)
+        }
+    def active_usersQ(self):
+        in_room = ActiveRoomUser.state.in_(("active", "inactive"))
+        return self.all_usersQ().filter(in_room)
+    def active_users(self,as_dict=False):
+        users = self.active_usersQ().all()
+        if as_dict:
+            return [u.to_dict() for u in users]
+        return users
+    def active_users_count(self):
+        return self.active_usersQ().count()
+
+    def all_usersQ(self):
+        return ActiveRoomUser.query.filter_by(room_id=self.id)
+    def all_users(self,as_dict=False):
+        users = self.all_usersQ().all()
+        if as_dict:
+            return [u.to_dict() for u in users]
+        return users
+    def all_users_count(self):
+        return self.all_usersQ().count()
 
     def get_users_nicknames(self):
         return [self.owner.nickname,] + [u.nickname for u in self.invited_users]
@@ -64,12 +91,12 @@ class Room(db.Model):
 class User(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     email = db.Column(db.String(80),unique=True)
-    realname = db.Column(db.String(80),unique=True)
-    Xpassword = db.Column(db.String(80))
-    token = db.Column(db.String(80))
-    pin = db.Column(db.String(80))
+    realname = db.Column(db.String(80))
     nickname = db.Column(db.String(20))
-    sid = db.Column(db.String(50))
+    Xpassword = db.Column(db.String(80))
+    # optional parameters
+    sid = db.Column(db.String(50),default=None, nullable=True)
+    ip_address = db.Column(db.String(20),default=None, nullable=True)
     reset_token = db.Column(db.String(80),default=None,nullable=True)
     is_active = db.Column(db.Boolean,default=True)
     is_anonymous=False
@@ -112,7 +139,6 @@ class User(db.Model):
 
     @classmethod
     def login(cls,username,password):
-        print(username,password)
         return User.query.filter_by(email=username,Xpassword=User.pw_enc(password)).first()
     def get_id(self):
         return self.id
@@ -147,28 +173,32 @@ class ProblemStatementTestCase(db.Model):
     problem = db.relationship('ProblemStatement', backref=db.backref('testcases', lazy=True))
     testcase_code = db.Column(db.String(80))
 
-class UserSolutions(db.Model):
+class UserSolution(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     candidate_id = db.Column(db.Integer,db.ForeignKey('active_room_user.id'))
     candidate = db.relationship('ActiveRoomUser', backref=db.backref('candidate_solutions', lazy=True))
+    language = db.Column(db.String(20), default="python")
     solution_code = db.Column(db.Text)
     correct = db.Column(db.Boolean,default=False)
     letter_grade = db.Column(db.String(1),default="I")
 
 
+def get_random_color():
+    return random.choice(COLOR_LIST)
 
 class ActiveRoomUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nickname = db.Column(db.String(20))
-    realname = db.Column(db.String(20))
+    nickname = db.Column(db.String(10))
+    realname = db.Column(db.String(60))
     email = db.Column(db.String(80))
     room_id = db.Column(db.Integer,db.ForeignKey('room.id'))
     room = db.relationship('Room', backref=db.backref('active_users', lazy=True))
-    sid = db.Column(db.String(80))
+    sid = db.Column(db.String(80),nullable=True,default=None)
     user_id = db.Column(db.Integer,default=None,nullable=True)
     is_active = db.Column(db.Boolean,default=True)
     state = db.Column(db.String(10),default="pending")
-    temporary_token  = db.Column(db.String(150),default="")
+    user_color = db.Column(db.String,default=get_random_color)
+    temporary_token  = db.Column(db.String(60),default="")
     invite_code = db.Column(db.String(80),default=create_invite_token)
     invite_expires = db.Column(db.DateTime,default=after_n_minutes(80))
     session_started = db.Column(db.DateTime,default=datetime.datetime.now)
@@ -176,6 +206,9 @@ class ActiveRoomUser(db.Model):
     @property
     def is_admin(self):
         return self.user_id
+    def make_temp_token(self):
+        self.temporary_token = create_token(self.user_id,self.room_id)
+        return self.temporary_token
     def is_alive(self):
         if self.is_admin:
             return True
@@ -194,7 +227,9 @@ class ActiveRoomUser(db.Model):
             "nickname":self.nickname,
             "username":self.nickname,
             "state":self.state,
+            "url":request.host_url+"join/"+self.invite_code,
             "is_admin":self.is_admin,
+            "user_color":self.user_color,
             "session_started":self.session_started.isoformat(),
             "session_ended":self.session_ended.isoformat() if self.session_ended else None,
             "is_active":self.is_active
@@ -218,5 +253,8 @@ class ActiveRoomUser(db.Model):
 
 if __name__ == "__main__":
     import flask
+    from flask_interviewpad.constants import DB_URI, COLOR_LIST
+
     app = flask.Flask(__name__)
-    app.config['']
+    init_app(app,DB_URI)
+    db.create_all()
