@@ -3,6 +3,7 @@ import datetime
 import time
 import hashlib
 import random
+import traceback
 
 from flask import request, session
 from flask_login import LoginManager, current_user
@@ -90,8 +91,50 @@ class Room(db.Model):
         return current_user.is_authenticated and current_user.id == self.owner_id
     def verify_allowed(self):
         return current_user.is_authenticated or ActiveRoomUser.query.filter_by(room_id=self.id,email=current_user.email).first()
+
+    def handle_change_message(self,data):
+        current_text_lines = self.current_text.splitlines()
+        start_line = data['start']['row']
+        end_line = data['end']['row']
+        try:
+            end_line_text = current_text_lines[end_line]
+        except IndexError:
+            end_line_text = ""
+        try:
+            start_line_text = current_text_lines[start_line]
+        except:
+            start_line_text = ""
+        if (data['action'] == "insert"):
+            print("INSERT?", data)
+            line0 = data['lines'].pop(0)
+            lhs = start_line_text[0:data['start']['column']]
+            rhs = start_line_text[data['start']['column']:]
+            if (not data['lines']):
+                try:
+                    current_text_lines[start_line] = lhs + line0 + rhs
+                except IndexError:
+                    current_text_lines.append(lhs + line0 + rhs)
+            else:
+                current_text_lines[start_line] = lhs + line0;
+                lineN = data['lines'].pop()
+                data['lines'].append(lineN + rhs)
+                current_text_lines[start_line + 1:start_line + 1] = data['lines']
+
+        elif (data['action'] == "remove"):
+            try:
+                lhs = start_line_text[0:data['start']['column']]
+            except:
+                lhs = ""
+            try:
+                rhs = end_line_text[data['end']['column']:]
+            except IndexError:
+                rhs = ""
+            new_line = lhs + rhs
+            current_text_lines[start_line:end_line + 1] = [new_line, ]
+        self.current_text= "\n".join(current_text_lines)
     def apply_edit(self,changeDetails):
-        print("GOT CHANGE:",changeDetails)
+        self.handle_change_message(changeDetails)
+        db.session.commit()
 class User(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     email = db.Column(db.String(80),unique=True)

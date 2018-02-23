@@ -167,8 +167,8 @@ function MySocketIO(ws_url,userCredentials,options){
     });
     self.on("sync_result",function(data){
         if(self.editor && data['room']['current_text'] != self.editor.value()){
-            var old_p = self.editor.getCursorPosition();
-            self.editor.value(data['room']['current_text'],old_p)
+            // var old_p = self.editor.getCursorPosition();
+            self.editor.value(data['room']['current_text'],-1)
         }
         self.users.setUsers(data['room']['users']);
         for(var i=0;i<self.users.usersList.length;i++){
