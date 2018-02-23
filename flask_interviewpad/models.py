@@ -90,7 +90,8 @@ class Room(db.Model):
         return current_user.is_authenticated and current_user.id == self.owner_id
     def verify_allowed(self):
         return current_user.is_authenticated or ActiveRoomUser.query.filter_by(room_id=self.id,email=current_user.email).first()
-
+    def apply_edit(self,changeDetails):
+        print("GOT CHANGE:",changeDetails)
 class User(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     email = db.Column(db.String(80),unique=True)
@@ -203,7 +204,7 @@ class ActiveRoomUser(db.Model):
     user_color = db.Column(db.String,default=get_random_color)
     temporary_token  = db.Column(db.String(60),default="")
     invite_code = db.Column(db.String(80),default=create_invite_token)
-    invite_expires = db.Column(db.DateTime,default=datetime_in(days=1))
+    invite_expires = db.Column(db.DateTime,default=datetime_in(hours=3))
     session_started = db.Column(db.DateTime,default=datetime.datetime.now)
     session_ended = db.Column(db.DateTime, default=None,nullable=True)
     @property
@@ -212,6 +213,11 @@ class ActiveRoomUser(db.Model):
     def make_temp_token(self):
         self.temporary_token = create_token(self.user_id,self.room_id)
         return self.temporary_token
+    def refresh_invite_token(self):
+        self.invite_code = create_invite_token()
+        self.invite_expires = datetime_in(hours=3)()
+
+
     def is_alive(self):
         if self.is_admin:
             return True
@@ -226,7 +232,9 @@ class ActiveRoomUser(db.Model):
     def to_dict(self):
         return {
             "email":self.email,
+            "id":self.id,
             "room_name":self.room.room_name,
+            "room_id":self.room_id,
             "nickname":self.nickname,
             "username":self.nickname,
             "state":self.state,

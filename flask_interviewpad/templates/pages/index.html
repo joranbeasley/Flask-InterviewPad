@@ -46,15 +46,17 @@
         );
         $(".modal").modal()
         $('.js-example-basic-single').select2({width:"150px",theme: "flat"});
-        var editor = new MyAceEditor('code-editorX');
+        editor = new MyAceEditor('code-editorX');
         editor.loadExtension("whitespace")
         editor.init()
         //token=btoa("{username}:{room_id}:{issued_timestamp}")
         var userCredentials = {'username':'{{ user.nickname }}','token':'{{ user.temporary_token }}'}
         ws =new MySocketIO("ws://localhost:5000",userCredentials)
-        ws.editor = editor;
+        ws.user_id = {{ user.id }};
+        ws.room_id = {{ user.room_id }}
+        ws.init_editor(editor);
         {% if current_user.is_admin %}
-            ws.handlebar_template = Handlebars.templates.alt_user_buttons
+            ws.users.handlebars_templ = Handlebars.templates.alt_user_buttons
         {% endif %}
         {#var users = {{ room.all_users(True)|encode("json") }};#}
         {#console.log(users)#}
@@ -75,14 +77,39 @@
         console.log("View Invitation:",ele);
         console.log($(ele).data('userInfo'))
         show_invitation($(ele).data('userInfo'))
+        $(".my-droplist").hide();
+    }
+
+    function reissue_invite(ele){
+        data = $(ele).data('userInfo')
+        console.log("re invite!:",data);
+        d2 = {
+            room_id:data['room_id'],
+            user_id:data['id']
+        };
+        $.ajax({
+          url: "/admin/reinvite",
+          type: "get", //send it through get method
+          data:d2,
+          success: function(response) {
+            console.log("REINVITED??",response)
+          },
+          error: function(xhr) {
+            //Do Something to handle error
+          }
+        });
+        $.get("/admin/reinvite",data['room_name'],)
+        $(".my-droplist").hide();
     }
     function send_whisper(ele){
         console.log("WHISPER:",ele);
         console.log($(ele).data('userInfo'))
+        $(".my-droplist").hide();
     }
     function kick_user(ele){
         console.log("Kick USER:",ele)
         console.log($(ele).data('userInfo'))
+        $(".my-droplist").hide();
     }
     function click_user(userDetails,evt){
         console.log(userDetails)

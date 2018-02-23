@@ -56,3 +56,32 @@ def on_room_join(payload):
     data = room_user.to_dict()
 
     emit('user_joined',data,room=str(room_user.room_id))
+@sock.on("push_select")
+def on_push_select(payload):
+    room_user = ActiveRoomUser.query.filter_by(id=payload['user_id']).first()
+    if not room_user:
+        print("ERROR No User?")
+        return;
+    if not room_user.sid == request.sid:
+        print("ERROR MISMATCH SID?")
+        return
+    if not room_user.room_id == payload['room_id']:
+        print("Error mismatch room!")
+        return
+    payload['user_color'] = room_user.user_color
+    emit("notify_editor_select",payload,include_self=False,room=str(room_user.room_id))
+@sock.on("push_change")
+def on_push_change(payload):
+    room_user = ActiveRoomUser.query.filter_by(id=payload['user_id']).first()
+    if not room_user:
+        print("ERROR No User?")
+        return;
+    if not room_user.sid == request.sid:
+        print("ERROR MISMATCH SID?")
+        return
+    if not room_user.room_id == payload['room_id']:
+        print("Error mismatch room!")
+        return
+    payload['user_color'] = room_user.user_color
+    room_user.room.apply_edit(payload['change'])
+    emit('notify_editor_change',payload,room=str(room_user.room_id),include_self=False)

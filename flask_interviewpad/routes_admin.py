@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 
 from flask_interviewpad.constants import COLOR_LIST
 from flask_interviewpad.models import Room, User, ActiveRoomUser, db
-
+from flask_interviewpad.models import create_invite_token
 bp = Blueprint('admin','admin',url_prefix='/admin')
 
 @bp.route("/")
@@ -15,7 +15,15 @@ def index():
     )
 
     return render_template("admin-pages/app-admin.html",**ctx)
-
+@bp.route("/reinvite")
+def reinvite_guest():
+    room_id, user_id = request.args.get('room_id'),request.args.get('user_id')
+    user = ActiveRoomUser.query.filter_by(room_id=room_id,id=user_id).first()
+    if not user:
+        return json.dumps({"result":"error","reason":"user %s not found in room %s"})
+    user.refresh_invite_token()
+    db.session.commit()
+    return json.dumps({"result":"OK","user":user.to_dict()})
 @bp.route("/create/<what>",methods=["POST"])
 def create_item(what):
     my_id = 1 # current_user.id
