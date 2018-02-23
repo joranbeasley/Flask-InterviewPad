@@ -96,6 +96,7 @@ class Room(db.Model):
         current_text_lines = self.current_text.splitlines()
         start_line = data['start']['row']
         end_line = data['end']['row']
+        replacement_lines = data['lines'][:]
         try:
             end_line_text = current_text_lines[end_line]
         except IndexError:
@@ -106,18 +107,18 @@ class Room(db.Model):
             start_line_text = ""
         if (data['action'] == "insert"):
             print("INSERT?", data)
-            line0 = data['lines'].pop(0)
+            line0 = replacement_lines.pop(0)
             lhs = start_line_text[0:data['start']['column']]
             rhs = start_line_text[data['start']['column']:]
-            if (not data['lines']):
+            if (not replacement_lines):
                 try:
                     current_text_lines[start_line] = lhs + line0 + rhs
                 except IndexError:
                     current_text_lines.append(lhs + line0 + rhs)
             else:
                 current_text_lines[start_line] = lhs + line0;
-                lineN = data['lines'].pop()
-                data['lines'].append(lineN + rhs)
+                lineN = replacement_lines.pop()
+                replacement_lines.append(lineN + rhs)
                 current_text_lines[start_line + 1:start_line + 1] = data['lines']
 
         elif (data['action'] == "remove"):
