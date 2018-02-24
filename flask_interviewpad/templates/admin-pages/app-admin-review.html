@@ -1,0 +1,25 @@
+{% extends "base/base_template.html" %}
+{% block extra_head %}
+
+{% endblock %}
+{% block body %}
+
+
+{% include "admin-components/room_tabbed_panel.html" %}
+
+
+
+{% endblock %}
+{% block endof_body %}
+<script>
+    console.log("???")
+    $(function() {
+        $(".modal").modal()
+    });
+function notify(ele,room_id){
+        var checked = $(ele).prop('checked')
+        $.get("/api/room_activation/"+room_id+"/"+(+checked))
+        console.log(ele,room_id,checked)
+    }
+</script>
+{% endblock %}

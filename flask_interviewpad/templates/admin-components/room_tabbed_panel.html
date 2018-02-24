@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col s12">
+        {% for user in room_users %}
+            {% if user.is_admin %}
+                <span class="reviewer-name">
+                    <i class="fa fa-square"></i> {{ user.nickname }}
+                </span>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="col s12">
+        <ul class="tabs">
+            {%  for user in room_users %}
+                {% if not user.is_admin %}
+                    <li class="tab col s3"><a href="#userdiv-{{ user.nickname }}">{{ user.realname|default(user.nickname) }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    {%  for candidate in room_users %}
+        {% if not candidate.is_admin %}
+            <div class="col s12" id="userdiv-{{ candidate.nickname }}">
+                {% include "admin-components/fragments/report_card.html" %}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+</div>

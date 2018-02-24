@@ -16,7 +16,7 @@
             <h5>By : {{ reviewer_name }}</h5>
             <table class="striped">
                 {% for label, input_name, current_rating in grades %}
-                    {% include "partials/stars_line.html" %}
+                    {% include "admin-components/reportcard-partials/stars_line.html" %}
                 {% endfor %}
 
                 <tr>

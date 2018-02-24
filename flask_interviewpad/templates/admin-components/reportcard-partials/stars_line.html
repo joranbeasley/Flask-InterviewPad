@@ -1,0 +1,10 @@
+<tr>
+   <th style="width: {{ label_width|default("250px") }};">
+       <strong>{{ label }}</strong>
+   </th>
+   <td>
+       {% with n_stars=5 %}
+            {% include "admin-components/reportcard-partials/some_stars.html" %}
+       {% endwith %}
+   </td>
+</tr>

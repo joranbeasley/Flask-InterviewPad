@@ -43,7 +43,16 @@ class CandidateEvaluation(db.Model):
     problem_solving = db.Column(db.Integer,nullable=True,default=None)
     creative = db.Column(db.Integer,nullable=True,default=None)
     organized = db.Column(db.Integer,nullable=True,default=None)
-
+    def get_grades(self):
+        keys=[
+            ('Technical Skills','technical_skills'),
+            ('Culture Fit','culture_fit'),
+            ('Enthusiasm to Learn','willingness_to_learn'),
+            ('Problem Solving','problem_solving'),
+            ('Creativity','creative'),
+            ('Organized','organized'),
+        ]
+        return [{'label':label,'key':key,'my_score':getattr(self,key)} for label,key in keys]
 
 
 class Room(db.Model):

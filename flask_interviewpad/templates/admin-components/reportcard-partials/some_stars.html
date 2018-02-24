@@ -1,0 +1,7 @@
+<div class="rating">
+    {% for i in range(n_stars,0,-1) %}
+      <label class="lbl">
+        <input type="radio" name="{{ input_name }}" value="{{ i }}" title="{{ i }} stars"> {{ i }}
+      </label>
+    {% endfor %}
+</div>

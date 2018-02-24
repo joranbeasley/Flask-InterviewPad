@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, json, flash
 from flask_login import current_user, login_required
 
 from flask_interviewpad.constants import COLOR_LIST
-from flask_interviewpad.models import Room, User, ActiveRoomUser, db
+from flask_interviewpad.models import Room, User, ActiveRoomUser, db, CandidateEvaluation
 from flask_interviewpad.models import create_invite_token
 bp = Blueprint('admin','admin',url_prefix='/admin')
 
@@ -15,6 +15,33 @@ def index():
     )
 
     return render_template("admin-pages/app-admin.html",**ctx)
+@bp.route("/room-evaluation/<room_id>")
+def room_evaluation(room_id):
+    ctx = dict(
+        room = Room.query.filter_by(id=room_id),
+        room_users = ActiveRoomUser.query.filter_by(room_id=room_id)
+    )
+    meta = {}
+
+    for user in ctx['room_users']:
+        if not user.is_admin:
+
+            candidate = CandidateEvaluation.query.filter_by(candidate_id=user.id,reviewer_id=current_user.id).first()
+            if not candidate:
+                candidate = CandidateEvaluation(reviewer_id=current_user.id,candidate_id=user.id)
+            meta[user.nickname] = {'grades': [], 'notes': candidate.notes or ''}
+
+            meta[user.nickname]['grades'] =  [
+                ('Culture Fit', 'culture_fit', candidate.culture_fit or -1),
+                ('Technical Skills','technical_skills',candidate.technical_skills or -1),
+                ('Enthusiasm to Learn','willingness_to_learn',candidate.willingness_to_learn or -1),
+                ('Enthusiasm to Learn','willingness_to_learn',candidate.willingness_to_learn or -1),
+                ('Problem Solving','problem_solving',candidate.problem_solving or -1),
+                ('Creativity','creative',candidate.creative or -1),
+                ('Organized','organized',candidate.organized or -1),
+            ]
+            ctx['meta']=meta
+    return render_template("admin-pages/app-admin-review.html",**ctx)
 @bp.route("/reinvite")
 def reinvite_guest():
     room_id, user_id = request.args.get('room_id'),request.args.get('user_id')
