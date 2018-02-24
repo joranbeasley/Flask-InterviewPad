@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "es5"
+  },
+  "files": [
+    "typescript_src/app.ts",
+    "typescript_src/ip_ws.ts"
+  ]
+}

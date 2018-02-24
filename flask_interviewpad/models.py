@@ -57,12 +57,17 @@ class Room(db.Model):
     is_active = db.Column(db.Boolean,default=True)
     current_text=db.Column(db.Text(),default="")
     created=db.Column(db.DateTime,default=datetime.datetime.now)
-    def to_dict(self):
+    def to_dict(self,users="all"):
+        usersList = []
+        if users == "all":
+            usersList = self.all_users(True)
+        elif users == "active":
+            usersList = self.active_users(True)
         return {
             "room_name":self.room_name,
             "language":self.language,
             "current_text":self.current_text,
-            "users":self.all_users(True)
+            "users": usersList
         }
     def active_usersQ(self):
         in_room = ActiveRoomUser.state.in_(("active", "inactive"))
@@ -234,7 +239,7 @@ class ActiveRoomUser(db.Model):
     realname = db.Column(db.String(60))
     email = db.Column(db.String(80))
     room_id = db.Column(db.Integer,db.ForeignKey('room.id'))
-    room = db.relationship('Room', backref=db.backref('active_users', lazy=True))
+    room = db.relationship('Room', backref=db.backref('active_room_users', lazy=True))
     sid = db.Column(db.String(80),nullable=True,default=None)
     user_id = db.Column(db.Integer,default=None,nullable=True)
     is_active = db.Column(db.Boolean,default=True)

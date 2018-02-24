@@ -73,9 +73,8 @@ function MySocketIO(ws_url,userCredentials,options){
     var self=this;
     self.socket = io.connect(ws_url,options);
     self.editor = null;
-    self.user_id = null;
-    self.room_id = null;
     self.user = null;
+    self.room = null;
     self.state="active"
     self.chat_panel = null;
     self.users = new UsersList();
@@ -90,7 +89,7 @@ function MySocketIO(ws_url,userCredentials,options){
         }
         self.blur_timer = setTimeout(function(){
             self.state="inactive";
-            self.emit('push_blur',{'user_id':self.user_id,'room_id':self.room_id});
+            self.emit('push_blur');
             self.blur_timer = null;
         },1000)
     };
@@ -99,13 +98,13 @@ function MySocketIO(ws_url,userCredentials,options){
             clearInterval(self.blur_timer)
             self.blur_timer = null;
         }else if(self.state === "inactive"){
-            self.emit('push_unblur',{'user_id':self.user_id,'room_id':self.room_id})
+            self.emit('push_unblur')
         }
     };
     this.notify_selection=function(){
         console.log("NOTIFY!")
         var selection = self.editor.editor_instance.getSelectionRange()
-        self.socket.emit("push_select",{selection:selection,user_id:self.user_id,room_id:self.room_id})
+        self.socket.emit("push_select",{selection:selection})
     };
     this.on_my_editor_select_change=function($ev){
         if(self.selection_timer){
@@ -132,7 +131,13 @@ function MySocketIO(ws_url,userCredentials,options){
         })
     };
 
-    this.emit=function(eventType,payload){
+    this.emit=function(eventType,payload,append_auth){
+        if(payload===undefined){
+            payload={}
+        }
+        if(append_auth!==false){
+            payload['auth']= {'user_id':self.user_id,'room_id':self.room_id}
+        }
         console.log("emit:",eventType,payload)
         self.socket.emit(eventType,payload)
     };
@@ -189,10 +194,20 @@ function MySocketIO(ws_url,userCredentials,options){
         }
         // self.editor.applyChange(delta)
     };
-    self.on("connect", function(data) {
-        console.log("Connected!~~",data)
-        self.emit("join_room",userCredentials)
+    self.on("connect", function() {
+        console.log("establishing handshake",userCredentials)
+        self.emit("handshake",userCredentials)
     });
+    self.on('handshake_accepted',function(payload){
+        self.user = payload.user;
+        self.room = payload.room;
+        self.users.setUsers(self.room.users)
+        console.log("handshakeAccepted:",payload)
+    });
+    self.on('handshake_rejected',function(payload){
+        console.log("handshakeRejected:",payload)
+        $(".handshake-error").modal("show")
+    })
     self.on("error", function(data){
         console.log("GOT ERROR MSG FROM WS:",data)
     });
@@ -219,6 +234,7 @@ function MySocketIO(ws_url,userCredentials,options){
         console.log("USER JOINED!:",data)
         Materialize.toast("User "+data['nickname']+" has joined the room!", 2000);
         var index = self.users.getUserIndexBy('id',data['id'])
+        console.log("Got index",index)
         self.users.updateUser(index,data)
     });
     self.on("user_left",function(data){
