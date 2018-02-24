@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="/static/bundle/scss-compiled/drop2.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
 
+    <script src="//cdn.jsdelivr.net/jquery.color-animation/1/mainfile"></script>
+
 {#    {% if is_admin %}#}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
 {%- endblock %}
@@ -28,9 +30,44 @@
 
 
     <script>
+    function flash_it(JQ_ele,start_color,end_color,times,callback) {
+        if (!times.length) {
+            if(callback) {
+                callback()
+            }
+        } else {
+            JQ_ele.animate({backgroundColor: start_color}, {
+                duration: times[0], complete: function () {
+                    if (times.length == 1) {
+                        if(callback) {
+                            callback()
+                        }
+                    } else {
+                        flash_it(JQ_ele, end_color, start_color, times.slice(1),callback)
+                    }
+
+                }
+            });
+        }
+    }
+    function cycle_new_messages(){
+        $(".new-message").each(function($idx,$ele){
+
+            var JQ_ele = $($ele);
+            var start_color = '#FFFFFFFF';
+            var end_color = JQ_ele.css('background-color');
+            var times = [200,400,150,300]
+            setTimeout(function() {flash_it(JQ_ele,start_color,end_color,times,
+            function(){console.log("OK FLASHED a few times!");JQ_ele.removeClass('new-message')})},$idx*250)
+        })
+    }
     function toggle_chat(){
         $('.chat-panel').toggleClass('open')
-        $('.comments > .num').remove()
+
+        cycle_new_messages();
+
+        $("#new-msg-indicator").addClass("hide")
+        $("#new-msg-indicator").text('0');
     }
 
     $(document).ready(function() {
@@ -55,8 +92,45 @@
         ws.user_id = {{ user.id }};
         ws.room_id = {{ user.room_id }}
         ws.init_editor(editor);
+        window.onblur=function(){
+            console.log("LOST FOCUS???")
+            ws.notify_blur()
+        }
+        window.onfocus=function(){
+            ws.cancel_blur()
+        };
+        ws.on("notify_chat_message",function(messageData){
+            var is_open=$('.chat-panel').hasClass('open');
+            if(!is_open){
+                $("#new-msg-indicator").text(parseInt($("#new-msg-indicator").text())+1);
+                $("#new-msg-indicator").removeClass("hide")
+            }
+            console.log("GOT MSG:",messageData);
+            var extra_classes = ['even','odd'][$('.chat-message').length%2]
+            extra_classes += is_open?'':' new-message';
+            var new_message = Handlebars.templates.chat_message({nickname:messageData.user.nickname,
+                                                                 message:messageData.message,
+                                                                 extra_class:extra_classes
+                                                                });
+            $('#chat-messages').append(new_message)
+            $('#chat-messages').animate({scrollTop: $('#chat-messages').prop("scrollHeight")}, 500);
+
+
+        });
         {% if current_user.is_admin %}
-            ws.users.handlebars_templ = Handlebars.templates.alt_user_buttons
+            ws.users.handlebars_templ = Handlebars.templates.alt_user_buttons;
+            ws.on('notify_user_blur',function(payload){
+                var userDiv = $("#user-"+payload['user']['nickname'])
+                userDiv.removeClass('active')
+                userDiv.addClass('inactive')
+            });
+            ws.on('notify_user_unblur',function(payload){
+                var userDiv = $("#user-"+payload['user']['nickname'])
+                userDiv.removeClass('inactive')
+                userDiv.addClass('active')
+            });
+        {% else %}
+            ws.users.handlebars_templ = Handlebars.templates.user_buttons
         {% endif %}
         {#var users = {{ room.all_users(True)|encode("json") }};#}
         {#console.log(users)#}
@@ -82,10 +156,11 @@
 
     function reissue_invite(ele){
         data = $(ele).data('userInfo')
-        console.log("re invite!:",data);
+        user = ws.users.getUserBy('nickname',data['nickname'])
+        console.log("re invite!:",user);
         d2 = {
-            room_id:data['room_id'],
-            user_id:data['id']
+            room_id:user['room_id'],
+            user_id:user['id']
         };
         $.ajax({
           url: "/admin/reinvite",
@@ -113,6 +188,7 @@
     }
     function click_user(userDetails,evt){
         console.log(userDetails)
+        if(userDetails.is_admin)return;
         var btn = $("#user-"+userDetails.nickname);
         console.log(btn)
         var bb = btn[0].getBoundingClientRect();
@@ -169,6 +245,13 @@
 
         }
     });
+    function on_send_chat_msg(ele){
+        var msg = ele.value;
+        ele.value = "";
+        console.log("OK SEND CHAT???",msg)
+        ws.send_chat_msg(msg)
+
+    }
     {#    {% endif %}#}
     </script>
 

@@ -1,10 +1,46 @@
 <div class="chat-panel">
-    <div class="wrap center"> <!-- Just to center ver and hor -->
-
-      <input  type="text" class="chat-input" id="name" placeholder="Send Message" >
+    <div id="chatbar" class="wrap center"> <!-- Just to center ver and hor -->
+      <input  type="text" onkeydown="event.keyCode==13?on_send_chat_msg(this):''" class="chat-input" id="name" placeholder="Send Message" >
     </div>
-
-    <div class="notification">
-        <hr class="hr-text" data-content="Welcome To Chat">
+    <div id="chat-messages">
+        <div class="notification">
+            <hr class="hr-text" data-content="Welcome To Chat">
+        </div>
+        <div class="chat-message">
+            <span class="message-author">nickname Says:</span>
+            <span class="message-text">message</span>
+        </div>
+        <div class="chat-message odd">
+            <span class="message-author">nickname Says:</span>
+            <span class="message-text">message</span>
+        </div>
+        <div class="chat-message">
+            <span class="message-author">nickname Says:</span>
+            <span class="message-text">message</span>
+        </div>
     </div>
 </div>
+<style>
+    @import url('https://fonts.googleapis.com/css?family=Inconsolata');
+    .chat-message{
+        border-bottom: thin solid grey;
+        padding:5px;
+        padding-left:10px;
+        font-family: 'Inconsolata', monospace;
+        background-color: #b1eafe;
+    }
+    .chat-message.odd{
+        background-color: #a9dff2;
+    }
+    .message-author{
+        font-size: 12px;
+        font-weight: bolder;
+        color: #99988e;
+        margin-right: 5px;
+    }
+    .message-text{
+        font-size:10px ;
+        font-weight: normal;
+        color:#63625C;
+    }
+</style>

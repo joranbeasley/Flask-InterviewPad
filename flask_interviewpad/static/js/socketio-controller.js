@@ -12,6 +12,7 @@ function UsersList(){
     };
     self.updateUser=function(index,userData){
         var user = self.usersList[index];
+        console.log("USER:",index,user)
         for(var key in userData){
             user[key] = userData[key]
         }
@@ -20,9 +21,7 @@ function UsersList(){
     };
     self.setUsers = function(userList){
         self.usersList = userList;
-        self._reindex_users();
-
-        self.render_users();
+        self.redraw()
     };
     self.addUser=function(userData){
         userData['index'] = self.usersList.length;
@@ -50,13 +49,23 @@ function UsersList(){
     self.removeUser=function(index){
        var user2remove = self.usersList[index];
        delete self.usersList[index];
-       self._reindex_users();
-       self.render_users()
+       self.redraw();
        return user2remove;
     };
+    self.redraw=function(){
+        self._reindex_users();
+        self.render_users();
+    };
     self.render_users=function(){
+        var tmp_userlist = [];
+        for(var i in self.usersList){
+            var user = self.usersList[i]
+            console.log("I:U:",i,user)
+            tmp_userlist.push({'nickname':user.nickname,'state':user.state,'user_color':user.user_color})
+        }
+        // console.log("RENDER USERS:",self.usersList)
         $("#users-holder").html(
-              self.handlebars_templ({'users':self.usersList})
+              self.handlebars_templ({'users':tmp_userlist})
         );
     }
 }
@@ -66,12 +75,33 @@ function MySocketIO(ws_url,userCredentials,options){
     self.editor = null;
     self.user_id = null;
     self.room_id = null;
+    self.user = null;
+    self.state="active"
     self.chat_panel = null;
     self.users = new UsersList();
     self.templ = {
         user_btn:Handlebars.templates.user_buttons
     };
     self.selection_timer = null;
+    self.blur_timer = null;
+    this.notify_blur = function(){
+        if(self.blur_timer){
+            clearTimeout(self.blur_timer)
+        }
+        self.blur_timer = setTimeout(function(){
+            self.state="inactive";
+            self.emit('push_blur',{'user_id':self.user_id,'room_id':self.room_id});
+            self.blur_timer = null;
+        },1000)
+    };
+    this.cancel_blur = function(){
+        if(self.blur_timer){
+            clearInterval(self.blur_timer)
+            self.blur_timer = null;
+        }else if(self.state === "inactive"){
+            self.emit('push_unblur',{'user_id':self.user_id,'room_id':self.room_id})
+        }
+    };
     this.notify_selection=function(){
         console.log("NOTIFY!")
         var selection = self.editor.editor_instance.getSelectionRange()
@@ -101,9 +131,7 @@ function MySocketIO(ws_url,userCredentials,options){
             self.selection_timer = setTimeout(self.notify_selection,1200)
         })
     };
-    this.init_chatpanel=function(){
 
-    };
     this.emit=function(eventType,payload){
         console.log("emit:",eventType,payload)
         self.socket.emit(eventType,payload)
@@ -129,6 +157,9 @@ function MySocketIO(ws_url,userCredentials,options){
 
         var marker = self.editor.updateMarker(my_user.marker.index,marker_details)
         console.log("New Updated Marker",marker)
+    };
+    this.send_chat_msg=function(msg){
+        self.emit("push_chat_message",{'message':msg,'user_id':self.user_id,'room_id':self.room_id})
     };
     this.apply_remote_change= function(details){
         if(details.user_id == self.user_id){
@@ -173,6 +204,9 @@ function MySocketIO(ws_url,userCredentials,options){
         self.users.setUsers(data['room']['users']);
         for(var i=0;i<self.users.usersList.length;i++){
             var user = self.users.usersList[i];
+            // if (user.id == self.user_id){ // this works... just not sure i need it
+            //     self.user = user;
+            // }
             var markerDetails = {color:user.user_color}
             var marker = self.editor.updateMarker(i,markerDetails);
             marker.extra['user'] = user;
@@ -184,10 +218,24 @@ function MySocketIO(ws_url,userCredentials,options){
     self.on("user_joined",function(data){
         console.log("USER JOINED!:",data)
         Materialize.toast("User "+data['nickname']+" has joined the room!", 2000);
+        var index = self.users.getUserIndexBy('id',data['id'])
+        self.users.updateUser(index,data)
+    });
+    self.on("user_left",function(data){
+        console.log("Goodbye:",data)
+        Materialize.toast("User "+data['nickname']+" has LEFT the room!", 2000);
+        var user=self.users.getUserBy('id',data['id'])
 
+        if(!user){
+            console.log("hmm no user here?",self.users.usersList)
+            return;
+        }
+        user.state="disconnected"
+        self.users.render_users()
     });
     self.on('notify_editor_change',self.apply_remote_change);
     self.on('notify_editor_select',self.apply_remote_select);
-    self.on('changed_editor',self.apply_remote_change);
+
+    // self.on('changed_editor',self.apply_remote_change);
     return this;
 }

@@ -1,5 +1,5 @@
 // Revisit this later i think ... for now we will just use js
-import Ace from "@types/ace"
+// import ace from "@types/ace"
 class user{
     email:string;
     state:string;
@@ -35,11 +35,10 @@ class MySocketIO{
 
 }
 class MyAceEditor{
-    editor:Ace;
+    private editor:any;
     constructor(divId:string){
         document.getElementById(divId)
-        this.editor = Ace.edit(divId)
-
+        this.editor = window['ace'].edit(divId,true)
     }
 }
 class MyChatPanel{

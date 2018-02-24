@@ -72,6 +72,8 @@ class Room(db.Model):
         if as_dict:
             return [u.to_dict() for u in users]
         return users
+    def active_admins(self):
+        return self.active_usersQ().filter(ActiveRoomUser.user_id>0).all()
     def active_users_count(self):
         return self.active_usersQ().count()
 
@@ -155,17 +157,7 @@ class User(db.Model):
     @property
     def is_authenticated(self):
         return bool(self.id) and self.id == current_user.id
-    @staticmethod
-    def exchange_token(ident_token):
-        invite = ActiveRoomUser.query.filter_by(invite_code=ident_token).first()
-        if not invite:
-            return False
-        if invite.invite_expires < datetime.datetime.now():
-            print("Invitation Expired At:%s"%invite.invite_expires)
-        session["X-authentication"] = ident_token
-        session["X-email"]=invite.email
-        session["X-room_id"]=invite.room_id
-        return invite.to_user()
+
 
     @staticmethod
     def alternate_user_loader():
@@ -201,6 +193,8 @@ class User(db.Model):
         if 'password' in kwargs:
             kwargs['Xpassword'] = self.pw_enc(kwargs.pop('password'))
         db.Model.__init__(self,**kwargs)
+    def __str__(self):
+        return "<User %s :%s>"%(self.nickname,self.id)
     @property
     def password(self):
         return "Nope, that wont work!"
@@ -254,6 +248,7 @@ class ActiveRoomUser(db.Model):
     @property
     def is_admin(self):
         return self.user_id
+
     def make_temp_token(self):
         self.temporary_token = create_token(self.user_id,self.room_id)
         return self.temporary_token

@@ -1,0 +1,39 @@
+<table class="bordered">
+    <tr>
+        <th>Question Group</th>
+        <th>Num Questions</th>
+        <th>Target Audience</th>
+        <th></th>
+        <th><a href="#add-user-modal" class="btn green modal-trigger">Add Question Group</a> </th>
+    </tr>
+
+    {% for user in question_groups %}
+        {% include "admin-components/fragments/questiongroup_table_row.html" %}
+    {% else %}
+        <tr><td colspan="5"><h5>Consider adding some question Groups to group questions into suites that are easily imported into interview rooms</h5></td></tr>
+    {% endfor %}
+</table>
+<table class="bordered">
+    <tr>
+        <th>Question Title</th>
+        <th>Difficulty</th>
+        <th>Completions</th>
+        <th>Rating</th>
+        <th><a href="#add-user-modal" class="btn green modal-trigger">Add Question</a> </th>
+    </tr>
+
+    {% for question in questions %}
+        {% include "admin-components/fragments/question_table_row.html" %}
+    {% else %}
+        <tr><td colspan="5"><h5>You Dont have any questions yet... go ahead and add questions to make it easier to appraise candidates</h5></td></tr>
+    {% endfor %}
+</table>
+<script>
+    function delete_user(username,user_id){
+        console.log("Delete?",username,user_id)
+
+        if( confirm("Really Delete User: "+username + "?")){
+            document.location.href= "/admin/delete/user/"+user_id.toString()
+        }
+    }
+</script>

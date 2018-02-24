@@ -20,6 +20,7 @@ def reinvite_guest():
     room_id, user_id = request.args.get('room_id'),request.args.get('user_id')
     user = ActiveRoomUser.query.filter_by(room_id=room_id,id=user_id).first()
     if not user:
+        print("Cannot find user:",request.args)
         return json.dumps({"result":"error","reason":"user %s not found in room %s"})
     user.refresh_invite_token()
     db.session.commit()

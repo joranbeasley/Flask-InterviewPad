@@ -4,6 +4,7 @@
             <li class="tab col s3"><a href="#rooms_tab">Manage Rooms</a></li>
             <li class="tab col s3"><a href="#users_tab">Manage Users</a></li>
             <li class="tab col s3"><a href="#candidate_tab">Candidate Grading</a></li>
+            <li class="tab col s3"><a href="#interview_questions">Manage InterviewQuestions</a></li>
         </ul>
     </div>
     <div class="col s12" id="rooms_tab">
@@ -14,5 +15,8 @@
     </div>
     <div class="col s12" id="candidate_tab">
         {% include "admin-components/candidate_list_table.html" %}
+    </div>
+    <div class="col s12" id="interview_questions">
+        {% include "admin-components/questions_list_table.html" %}
     </div>
 </div>
