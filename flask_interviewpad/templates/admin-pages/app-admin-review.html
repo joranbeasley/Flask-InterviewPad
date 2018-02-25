@@ -1,6 +1,10 @@
 {% extends "base/base_template.html" %}
 {% block extra_head %}
-
+<link rel="stylesheet" href="/static/css/stars.css" />
+    <script src="/static/js/stars.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/languages/{{ room.language|default('python') }}.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/styles/{{ highlight_theme|default('darkula') }}.min.css" />
 {% endblock %}
 {% block body %}
 
@@ -15,6 +19,9 @@
     console.log("???")
     $(function() {
         $(".modal").modal()
+        $('pre code').each(function(i, block) {
+            hljs.highlightBlock(block);
+          });
     });
 function notify(ele,room_id){
         var checked = $(ele).prop('checked')

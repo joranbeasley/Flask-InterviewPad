@@ -3,7 +3,10 @@
         {% for user in room_users %}
             {% if user.is_admin %}
                 <span class="reviewer-name">
-                    <i class="fa fa-square"></i> {{ user.nickname }}
+                    <i class="far fa-square"></i> {{ user.nickname }}
+                </span>
+                <span class="reviewer-name">
+                    <i class="far fa-check-square"></i> {{ user.nickname }}
                 </span>
             {% endif %}
         {% endfor %}

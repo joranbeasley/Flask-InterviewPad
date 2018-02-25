@@ -2,9 +2,9 @@
     <div class="col s6">
         <h3>Review of : {{ candidate.realname|default(candidate.nickname) }}</h3>
 
-        <h5>By : {{ current_user }}</h5>
+        <h5>By : {{ current_user.realname }}</h5>
         <table class="striped">
-            {% for label, input_name, current_rating in grades %}
+            {% for field in evaluations[candidate.nickname].get_grades() %}
                 {% include "admin-components/reportcard-partials/stars_line.html" %}
             {% endfor %}
 
@@ -18,6 +18,6 @@
         </table>
     </div>
     <div class="col s6" style="display:inline-block;height: 600px;overflow: scroll">
-        <pre><code class="{{ language|default("python") }}">{{ candidates_code }}</code></pre>
+        <pre><code class="{{ language|default("python") }}">{{ candidate.room.current_text }}</code></pre>
     </div>
 </div>

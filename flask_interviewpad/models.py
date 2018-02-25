@@ -44,6 +44,17 @@ class CandidateEvaluation(db.Model):
     creative = db.Column(db.Integer,nullable=True,default=None)
     organized = db.Column(db.Integer,nullable=True,default=None)
     def get_grades(self):
+        all_evaluations = CandidateEvaluation.query.filter_by(candidate_id=self.candidate_id).all()
+        keys = ['technical_skills','culture_fit','willingness_to_learn','problem_solving','creative','organized']
+        key_labels = ['Technical Skills','Culture Fit','Enthusiasm to Learn','Problem Solving','Creativity','Organized']
+
+        all_scores = {}
+        for evaluation in all_evaluations:
+            for key in keys:
+                if getattr(evaluation,key):
+                    all_scores.setdefault(key,[]).append(getattr(evaluation,key))
+
+        averages = {key:1.0*sum(vals)/len(vals) for key,vals in all_scores.items()}
         keys=[
             ('Technical Skills','technical_skills'),
             ('Culture Fit','culture_fit'),
@@ -52,7 +63,7 @@ class CandidateEvaluation(db.Model):
             ('Creativity','creative'),
             ('Organized','organized'),
         ]
-        return [{'label':label,'key':key,'my_score':getattr(self,key)} for label,key in keys]
+        return [{'label':label,'key':key,'my_score':getattr(self,key),'average':averages.get('key',-1)} for label,key in keys]
 
 
 class Room(db.Model):

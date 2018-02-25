@@ -21,26 +21,17 @@ def room_evaluation(room_id):
         room = Room.query.filter_by(id=room_id),
         room_users = ActiveRoomUser.query.filter_by(room_id=room_id)
     )
-    meta = {}
+    evaluations = {}
 
     for user in ctx['room_users']:
         if not user.is_admin:
 
-            candidate = CandidateEvaluation.query.filter_by(candidate_id=user.id,reviewer_id=current_user.id).first()
-            if not candidate:
-                candidate = CandidateEvaluation(reviewer_id=current_user.id,candidate_id=user.id)
-            meta[user.nickname] = {'grades': [], 'notes': candidate.notes or ''}
-
-            meta[user.nickname]['grades'] =  [
-                ('Culture Fit', 'culture_fit', candidate.culture_fit or -1),
-                ('Technical Skills','technical_skills',candidate.technical_skills or -1),
-                ('Enthusiasm to Learn','willingness_to_learn',candidate.willingness_to_learn or -1),
-                ('Enthusiasm to Learn','willingness_to_learn',candidate.willingness_to_learn or -1),
-                ('Problem Solving','problem_solving',candidate.problem_solving or -1),
-                ('Creativity','creative',candidate.creative or -1),
-                ('Organized','organized',candidate.organized or -1),
-            ]
-            ctx['meta']=meta
+            candidate_eval = CandidateEvaluation.query.filter_by(candidate_id=user.id,reviewer_id=current_user.id).first()
+            if not candidate_eval:
+                candidate_eval = CandidateEvaluation(reviewer=current_user,candidate=user)
+            evaluations[user.nickname] = candidate_eval
+            ctx['evaluations']=evaluations
+    print("OK EVALUATIONS:",ctx)
     return render_template("admin-pages/app-admin-review.html",**ctx)
 @bp.route("/reinvite")
 def reinvite_guest():
