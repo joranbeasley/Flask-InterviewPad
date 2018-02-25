@@ -25,8 +25,12 @@ class SockAuth:
     @staticmethod
     def required(fn):
         def __inner(payload,*args,**kwargs):
-            room_user = ActiveRoomUser.query.filter_by(id=payload['user_id']).first()
-            if (SockAuth.authorized_room(room_user) != payload['room_id']):
+            try:
+                room_user = ActiveRoomUser.query.filter_by(id=payload['auth']['user_id']).first()
+            except:
+                print("PAYLOAD CHECK:", payload)
+                raise
+            if (SockAuth.authorized_room(room_user) != payload['auth']['room_id']):
                 raise AuthorizationError("Room Authorization mismatch")
             try:
                 return fn(payload,room_user,*args,**kwargs)

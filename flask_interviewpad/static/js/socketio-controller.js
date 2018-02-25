@@ -104,7 +104,7 @@ function MySocketIO(ws_url,userCredentials,options){
     this.notify_selection=function(){
         console.log("NOTIFY!")
         var selection = self.editor.editor_instance.getSelectionRange()
-        self.socket.emit("push_select",{selection:selection})
+        self.emit("push_select",{selection:selection})
     };
     this.on_my_editor_select_change=function($ev){
         if(self.selection_timer){
